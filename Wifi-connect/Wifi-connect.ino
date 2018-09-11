@@ -1,10 +1,10 @@
 #include <DHT.h>
 #include <ESP8266WiFi.h>
 
-const char* ssid = "영민s";
-const char* password = "pppppppp";
-IPAddress ip(172,20,10,8);
-IPAddress gateway(172,20,10,1);
+const char* ssid = "YM";
+const char* password = "dPwls0103";
+IPAddress ip(169,254,37,140);
+IPAddress gateway(169,254,137,1);
 IPAddress subnet(255,255,255,241);
 
 #define D0 16 // LED(5파이)
@@ -21,6 +21,8 @@ IPAddress subnet(255,255,255,241);
 
 DHT dht(DHT_PIN, DHTTYPE);
 int USBLED_state, light_value;
+unsigned long prevTime = 0;
+unsigned long currentTime = 0;
 float temperature, humidity;
 WiFiServer server(80);
 void setup() {
@@ -60,9 +62,30 @@ void setup() {
   }
   
 void loop() {
+  
   //Check if a client has connected 
   WiFiClient client = server.available(); 
+
+ light_value = analogRead(LIGHT_PIN);
+  delay(100);
+
   if(!client) {
+     currentTime = millis();
+    if(currentTime - prevTime >= 10000){
+      digitalWrite(RELAY1_PIN, RELAY_OFF);
+      USBLED_state = RELAY_OFF;
+    }
+ 
+  if(light_value < 500){
+    digitalWrite(RELAY1_PIN, RELAY_ON);
+    USBLED_state = RELAY_ON;
+  }
+  if((light_value > 700) && (currentTime - prevTime >= 10000)){
+    digitalWrite(RELAY1_PIN, RELAY_OFF);
+    USBLED_state = RELAY_OFF;
+  }
+
+
     return; 
   }
   humidity = dht.readHumidity();
@@ -78,7 +101,7 @@ void loop() {
   Serial.print(temperature); 
   Serial.print(" Humidity = "); 
   Serial.println(humidity);
-  light_value = analogRead(LIGHT_PIN); //Wait untill the client sends some data 
+  //light_value = analogRead(LIGHT_PIN); //Wait untill the client sends some data 
   Serial.println("new client"); 
   while(!client.available()){
     delay(1);
@@ -92,13 +115,17 @@ void loop() {
   if(request.indexOf("/LED/OFF") != -1) {
     digitalWrite(LED_PIN, LED_OFF); }
   //Match the request for USBLED
-  if (request.indexOf("/USBLED/ON") != -1) {
+  if ((request.indexOf("/USBLED/ON") != -1)&&(USBLED_state == RELAY_OFF)) {
     digitalWrite(RELAY1_PIN, RELAY_ON);
-    USBLED_state = RELAY_ON; }
+    USBLED_state = RELAY_ON;
+     prevTime = millis();
+    }
+
   if(request.indexOf("/USBLED/OFF") != -1) 
     { digitalWrite(RELAY1_PIN, RELAY_OFF);
       USBLED_state = RELAY_OFF; 
     }
+  
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/html");
   client.println("");
@@ -116,6 +143,10 @@ client.println("<p>");
 client.println("</p>");
 client.println("<a href=\"/LED/ON\"\"><button>LED On </button></a>"); 
 client.println("<a href=\"/LED/OFF\"\"><button>LED Off </button></a><br/>"); 
+client.println("<p>");
+client.println("</p>");
+client.println("<a href=\"/USBLED/ON\"\"><button>USBLED On </button></a>"); 
+client.println("<a href=\"/USBLED/OFF\"\"><button>USBLED Off </button></a><br/>"); 
 client.println("<p>");
 client.print("Temperature : "); 
 client.println(temperature);
