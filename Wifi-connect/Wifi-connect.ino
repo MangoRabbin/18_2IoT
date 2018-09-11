@@ -70,17 +70,17 @@ void loop() {
   delay(100);
 
   if(!client) {
-     currentTime = millis();
-    if(currentTime - prevTime >= 10000){
+     currentTime = millis(); // check current time
+    if(currentTime - prevTime >= 10000){ // over 10 sec, turn off
       digitalWrite(RELAY1_PIN, RELAY_OFF);
       USBLED_state = RELAY_OFF;
     }
  
-  if(light_value < 500){
+  if(light_value < 500){ //lux < 500 => USBLED On
     digitalWrite(RELAY1_PIN, RELAY_ON);
     USBLED_state = RELAY_ON;
   }
-  if((light_value > 700) && (currentTime - prevTime >= 10000)){
+  if((light_value > 700) && (currentTime - prevTime >= 10000)){ // lux > 700 And over 10 sec => USBLED Off
     digitalWrite(RELAY1_PIN, RELAY_OFF);
     USBLED_state = RELAY_OFF;
   }
@@ -118,7 +118,7 @@ void loop() {
   if ((request.indexOf("/USBLED/ON") != -1)&&(USBLED_state == RELAY_OFF)) {
     digitalWrite(RELAY1_PIN, RELAY_ON);
     USBLED_state = RELAY_ON;
-     prevTime = millis();
+     prevTime = millis(); // check button click time.
     }
 
   if(request.indexOf("/USBLED/OFF") != -1) 
@@ -145,8 +145,8 @@ client.println("<a href=\"/LED/ON\"\"><button>LED On </button></a>");
 client.println("<a href=\"/LED/OFF\"\"><button>LED Off </button></a><br/>"); 
 client.println("<p>");
 client.println("</p>");
-client.println("<a href=\"/USBLED/ON\"\"><button>USBLED On </button></a>"); 
-client.println("<a href=\"/USBLED/OFF\"\"><button>USBLED Off </button></a><br/>"); 
+client.println("<a href=\"/USBLED/ON\"\"><button>USBLED On </button></a>"); // USBLED BUTTON ON
+client.println("<a href=\"/USBLED/OFF\"\"><button>USBLED Off </button></a><br/>"); // USBLED BUTTON OFF
 client.println("<p>");
 client.print("Temperature : "); 
 client.println(temperature);
