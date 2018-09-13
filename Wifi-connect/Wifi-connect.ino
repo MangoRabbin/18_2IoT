@@ -71,12 +71,16 @@ void loop() {
 
   if(!client) {
      currentTime = millis(); // check current time
-    if(currentTime - prevTime >= 10000){ // over 10 sec, turn off
+    if((currentTime - prevTime >= 10000)&& (USBLED_state == RELAY_ON)){ // over 10 sec, turn off
       digitalWrite(RELAY1_PIN, RELAY_OFF);
       USBLED_state = RELAY_OFF;
     }
+    else if((currentTime - prevTime >= 10000)&& (USBLED_state == RELAY_OFF)){ // over 10 sec, turn on
+      digitalWrite(RELAY1_PIN, RELAY_ON);
+      USBLED_state = RELAY_ON;
+    }
  
-  if(light_value < 500){ //lux < 500 => USBLED On
+  if((light_value < 500) &&(currentTime - prevTime >= 10000)){ //lux < 500 => USBLED On
     digitalWrite(RELAY1_PIN, RELAY_ON);
     USBLED_state = RELAY_ON;
   }
@@ -121,9 +125,10 @@ void loop() {
      prevTime = millis(); // check button click time.
     }
 
-  if(request.indexOf("/USBLED/OFF") != -1) 
+  if((request.indexOf("/USBLED/OFF") != -1) &&((USBLED_state == RELAY_ON)))
     { digitalWrite(RELAY1_PIN, RELAY_OFF);
       USBLED_state = RELAY_OFF; 
+       prevTime = millis(); // check button click time.
     }
   
   client.println("HTTP/1.1 200 OK");
