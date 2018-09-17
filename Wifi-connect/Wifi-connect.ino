@@ -71,23 +71,23 @@ void loop() {
 
   if(!client) {
      currentTime = millis(); // check current time
-    if((currentTime - prevTime >= 10000)&& (USBLED_state == RELAY_ON)){ // over 10 sec, turn off
+    if((currentTime - prevTime >= 10000)){ // over 10 sec, turn off
       digitalWrite(RELAY1_PIN, RELAY_OFF);
       USBLED_state = RELAY_OFF;
     }
-    else if((currentTime - prevTime >= 10000)&& (USBLED_state == RELAY_OFF)){ // over 10 sec, turn on
+    if((currentTime - prevTime >= 10000)){ // over 10 sec, turn on
       digitalWrite(RELAY1_PIN, RELAY_ON);
       USBLED_state = RELAY_ON;
     }
  
-  if((light_value < 500) &&(currentTime - prevTime >= 10000)){ //lux < 500 => USBLED On
-    digitalWrite(RELAY1_PIN, RELAY_ON);
-    USBLED_state = RELAY_ON;
-  }
-  if((light_value > 700) && (currentTime - prevTime >= 10000)){ // lux > 700 And over 10 sec => USBLED Off
-    digitalWrite(RELAY1_PIN, RELAY_OFF);
-    USBLED_state = RELAY_OFF;
-  }
+    if((light_value < 400)&&(currentTime - prevTime >= 10000)) { //lux < 400 => USBLED On
+      digitalWrite(RELAY1_PIN, RELAY_ON);
+      USBLED_state = RELAY_ON;
+    }
+    if((light_value > 800)&&(currentTime - prevTime >= 10000)){ // lux > 800 And over 10 sec => USBLED Off
+      digitalWrite(RELAY1_PIN, RELAY_OFF);
+      USBLED_state = RELAY_OFF;
+    }
 
 
     return; 
