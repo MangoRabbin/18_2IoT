@@ -23,8 +23,8 @@ const char* ssid = "YM";
 const char* password = "godisgood";
 const char* mymqtt_client_id = "iot_nodeMCU_21400670";
 
-char* topic = "21400670";
-char* server ="192.168.2.4";
+char* topic = "iot";
+char* server ="203.252.106.154";
 char message_buff[100]; // initialize storage buffer
 
 WiFiClient wifiClient;
@@ -96,9 +96,13 @@ void setup() {
   Serial.println("WiFi Connected");
   Serial.println(WiFi.localIP());
 
-  if(client.connect(mymqtt_client_id)){
-    client.publish(topic,"Publishing message form my nodeMCU");
-    client.subscribe(topic);
+//  if(client.connect(mymqtt_client_id)){
+//    client.publish(topic,"Publishing message form my nodeMCU");
+//    client.subscribe(topic);
+//  }
+  if(client.connect(mymqtt_clinent_id,mqtt_user, mqtt_pwd)){
+    client.publish(mqtt_topic,"Publishing message from my nodeMCU");
+    client.subscribe(mqtt_topic);
   }
 }
 
