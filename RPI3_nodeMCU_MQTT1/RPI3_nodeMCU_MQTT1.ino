@@ -79,7 +79,7 @@ void setup() {
   delay(10);
   pinMode(ledPin, OUTPUT); // Initialize the LED_BUILTIN pin as an output
   digitalWrite(ledPin, LEDOFF); //LED off
-
+  
   Serial.println();
   Serial.println();
   Serial.println("Connecting to");

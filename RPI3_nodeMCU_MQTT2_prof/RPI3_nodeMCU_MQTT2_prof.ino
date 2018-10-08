@@ -4,7 +4,7 @@
 #include <DHT.h>
 
 #define D0 16 //LED
-#define D1 5 
+#define D1 5 //USBLED
 #define DHT_PIN 4 //온습도
 #define D3 0 
 #define D4 2 
@@ -15,6 +15,9 @@
 #define LEDOFF LOW
 #define LEDON HIGH
 #define DHTTYPE DHT22
+#define RELAY_OFF HIGH
+#define RELAY_ON LOW
+
 
 DHT dht(DHT_PIN, DHTTYPE);
 float temperature, humidity;
@@ -29,6 +32,8 @@ char message_buff[100]; // initialize storage buffer
 
 WiFiClient wifiClient;
 int ledPin = D0; // GPIO 16
+int RELAY_PIN = D1; //GPIO 5
+int relay_state = RELAY_OFF;
 
 
 void callback(char* topic, byte* payload, unsigned int length)
@@ -44,8 +49,8 @@ void callback(char* topic, byte* payload, unsigned int length)
  message_buff[i]= '\0';
  String msgString = String(message_buff);
  Serial.println("Payload: "+ msgString);
- //int state = digitalRead(ledPin);
- int LED_state;
+ int LED_state = digitalRead(ledPin);
+ int RELAY_state = digitalRead(RELAY_PIN);
  //전송된 메시가 "led"이면 LED를 받을 때마다 켜고 끈다.(토글) 
  if (msgString == "ledon"){
  digitalWrite(ledPin, LEDON);
@@ -57,7 +62,12 @@ void callback(char* topic, byte* payload, unsigned int length)
  LED_state = LEDOFF;
  Serial.println("Switching LED");
   }
- else if(msgString == "dht22"){
+  if(msgString == "usbled"){
+    relay_state = RELAY_ON;
+    digitalWrite(RELAY_PIN,!relay_state)
+  }
+  if(msgString == "usbledon")
+ if(msgString == "dht22"){
       humidity = dht.readHumidity();
       temperature = dht.readTemperature();
     while((isnan(humidity) || isnan(temperature))){
@@ -79,7 +89,8 @@ void setup() {
   delay(10);
   pinMode(ledPin, OUTPUT); // Initialize the LED_BUILTIN pin as an output
   digitalWrite(ledPin, LEDOFF); //LED off
-
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, RELAY_OFF);
   Serial.println();
   Serial.println();
   Serial.println("Connecting to");
